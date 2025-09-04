@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "../stack";
+import { AccessTokenProvider } from "@/access-token-provider";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import Loading from "./loading";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +32,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <StackProvider app={stackServerApp}>
+          <StackTheme>
+            <Suspense fallback={<Loading />}>
+              <AccessTokenProvider>
+                {children}
+              </AccessTokenProvider>
+            </Suspense>
+          </StackTheme>
+        </StackProvider>
       </body>
     </html>
   );
