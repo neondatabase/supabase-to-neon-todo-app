@@ -1,24 +1,24 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { Todo } from "@/types/Todo";
 import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import { CurrentInternalUser, CurrentUser } from "@stackframe/stack";
 import Link from "next/link";
+import { usePostgrest } from "@/lib/postgrest";
 
-export const TodoApp = ({ user }: { user: User }) => {
+export const TodoApp = ({ user }: { user: CurrentUser | CurrentInternalUser }) => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [newTitle, setNewTitle] = useState("");
-    const supabase = createClient();
+    const postgrest = usePostgrest();
     const userId = user.id;
-    const userName = user.user_metadata?.name || user.email || "User";
+    const userName = user.displayName || user.primaryEmail || "User";
 
     useEffect(() => {
         loadTodos();
     }, [userId]);
 
     async function loadTodos() {
-        const { data, error } = await supabase
+        const { data, error } = await postgrest
             .from("todos")
             .select("*")
             .order("inserted_at", { ascending: false });
@@ -35,7 +35,7 @@ export const TodoApp = ({ user }: { user: User }) => {
         const title = newTitle.trim();
         if (!title) return;
 
-        const { data, error } = await supabase
+        const { data, error } = await postgrest
             .from("todos")
             .insert([{ title, user_id: userId }])
             .select()
@@ -51,7 +51,7 @@ export const TodoApp = ({ user }: { user: User }) => {
     }
 
     async function toggleComplete(todo: Todo) {
-        const { data, error } = await supabase
+        const { data, error } = await postgrest
             .from("todos")
             .update({ is_complete: !todo.is_complete })
             .eq("id", todo.id)
@@ -70,7 +70,7 @@ export const TodoApp = ({ user }: { user: User }) => {
         const trimmed = title.trim();
         if (!trimmed || trimmed === todo.title) return;
 
-        const { data, error } = await supabase
+        const { data, error } = await postgrest
             .from("todos")
             .update({ title: trimmed })
             .eq("id", todo.id)
@@ -86,7 +86,7 @@ export const TodoApp = ({ user }: { user: User }) => {
     }
 
     async function deleteTodo(todo: Todo) {
-        const { error } = await supabase.from("todos").delete().eq("id", todo.id);
+        const { error } = await postgrest.from("todos").delete().eq("id", todo.id);
         if (error) {
             alert(error.message);
             return;
@@ -102,7 +102,7 @@ export const TodoApp = ({ user }: { user: User }) => {
                     <p className="text-gray-600 dark:text-gray-400 text-sm">Welcome, {userName}!</p>
                     <Link href="/protected" className="inline-block mt-2 px-4 py-2 bg-pink-400 text-white rounded-lg hover:bg-pink-600 transition-all duration-200">Open Protected Page</Link>
                 </div>
-                <button onClick={() => supabase.auth.signOut()} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200">Sign out</button>
+                <button onClick={() => user.signOut()} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200">Sign out</button>
             </header>
 
             <form onSubmit={addTodo} className="flex gap-3 mb-6">

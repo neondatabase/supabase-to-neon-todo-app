@@ -9,31 +9,32 @@
 This repository is the companion to our guide on migrating a full-stack application from Supabase to Neon.
 
 > [!NOTE]
-> You are on the `supabase` branch.
-> This branch contains the original Next.js application **before** the migration. It is fully functional and runs on the Supabase stack, using Supabase Auth and the Supabase data client.
+> You are on the `neon` branch.
 >
-> To see the final, migrated application running on Neon, check out the **[`neon` branch](https://github.com/neondatabase-labs/supabase-to-neon-todo-app/tree/neon)**.
+> This branch contains the final Next.js application **after** it has been successfully migrated to the Neon stack. It uses Neon Auth for authentication and connects to a Neon Postgres database via the Neon Data API.
+>
+> To see the original application running on Supabase, check out the **[`supabase` branch](https://github.com/neondatabase-labs/supabase-to-neon-todo-app/tree/supabase)**.
 
 ---
 
 ### Technology Stack
 
 *   **Framework**: Next.js (App Router)
-*   **Database**: Supabase Postgres
-*   **Authentication**: Supabase Auth (`@supabase/ssr`)
-*   **Data Access**: Supabase Client (`@supabase/ssr`)
+*   **Database**: **Neon Postgres**
+*   **Authentication**: **Neon Auth (`@stackframe/stack`)**
+*   **Data Access**: **Neon Data API (via `postgrest-js`)**
 *   **Styling**: Tailwind CSS
 
 ### 🚀 Get Started
 
-To run this version of the application locally, you'll need a Supabase project.
+To run this version of the application locally, you'll need a Neon project with Neon Auth and the Data API enabled.
 
-1.  **Clone the repository and check out this branch:**
+1.  **Clone the repository:**
     ```bash
     git clone https://github.com/neondatabase-labs/supabase-to-neon-todo-app.git
     cd supabase-to-neon-todo-app
-    git checkout supabase
     ```
+    *(You will be on the `neon` branch by default.)*
 
 2.  **Install dependencies:**
     ```bash
@@ -45,10 +46,15 @@ To run this version of the application locally, you'll need a Supabase project.
         ```bash
         cp .env.example .env.local
         ```
-    -   Open `.env.local` and add your Supabase Project URL and Anon Key. You can find these in your Supabase project dashboard under **Project Settings > API**.
+    -   Open `.env.local` and add your Neon Data API URL and Neon Auth credentials. You can find these in your Neon project dashboard.
         ```env
-        NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-        NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+        # Found in the Neon Data API page
+        NEXT_PUBLIC_DATA_API_URL=YOUR_NEON_DATA_API_URL
+
+        # Found in the Neon Auth > Configuration page
+        NEXT_PUBLIC_STACK_AUTH_URL=YOUR_STACK_AUTH_URL
+        NEXT_PUBLIC_STACK_PROJECT_ID=YOUR_STACK_PROJECT_ID
+        STACK_SECRET_SERVER_KEY=YOUR_STACK_SECRET_SERVER_KEY
         ```
 
 4.  **Run the development server:**
@@ -58,11 +64,14 @@ To run this version of the application locally, you'll need a Supabase project.
 
 The application will be available at `http://localhost:3000`.
 
-### Migration overview
+### The Migration Story
 
-This application represents the starting point for the migration detailed in our comprehensive guide. The goal is to move this entire stack: database, auth, and application code to Neon.
+This application is the final result of the migration process. Key changes from the `supabase` branch include:
+-   Removal of all Supabase client libraries (`@supabase/ssr`).
+-   Integration of the Neon Auth SDK (`@stackframe/stack`) for user authentication, session management, and route protection.
+-   Replacement of the Supabase data client with `postgrest-js` to interact with the Neon Data API.
 
-The complete, line-by-line code changes required for the migration can be reviewed in the project's pull request:
+The complete, line-by-line code changes can be reviewed in the project's pull request:
 
 ➡️ **[View the Supabase to Neon Migration PR](https://github.com/neondatabase-labs/supabase-to-neon-todo-app/pull/3/files)**
 
